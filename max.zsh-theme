@@ -1,29 +1,24 @@
-# vim:ft=zsh ts=2 sw=2 sts=2
+# Max - Oh-My-Zsh Theme
 
-rvm_current() {
-  rvm current 2>/dev/null
+autoload -Uz vcs_info
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' unstagedstr "%F{003} ●"   # display this when there are unstaged changes
+zstyle ':vcs_info:*' stagedstr "%F{046} ✚"  # display this when there are staged changes
+zstyle ':vcs_info:*' actionformats \
+    '%F{5}%F{5}%F{2}%b%F{3}|%F{1}%a%c%u%F{5}%f '
+zstyle ':vcs_info:*' formats       \
+    '%F{red} %F{reset_color}on %F{5}%F{5}%F{2}%b%c%u%F{5}%f '
+zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
+zstyle ':vcs_info:*' enable git cvs svn
+
+theme_precmd () {
+    vcs_info
 }
 
-rbenv_version() {
-  rbenv version 2>/dev/null | awk '{print $1}'
-}
-
+setopt prompt_subst
 PROMPT='
-%{$fg_bold[red]%}${PWD/#$HOME/~}%{$reset_color%}$(git_prompt_info)
+%{$fg_bold[red]%}${PWD/#$HOME/~}%{$reset_color%} ${vcs_info_msg_0_}
 🌊 '
 
-# Must use Powerline font, for \uE0A0, \u2718 and \u00b1 to render.
-ZSH_THEME_GIT_PROMPT_PREFIX=" on %{$fg[magenta]%}\uE0A0 "
-ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
-ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[magenta]%} \u00b1"
-ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg[green]%} \u2718"
-ZSH_THEME_GIT_PROMPT_CLEAN=""
-
-if [ -e ~/.rvm/bin/rvm-prompt ]; then
-  RPROMPT='%{$fg_bold[red]%}‹$(rvm_current)›%{$reset_color%}'
-else
-  if which rbenv &> /dev/null; then
-    RPROMPT='%{$fg_bold[red]%}$(rbenv_version)%{$reset_color%}'
-  fi
-fi
-
+autoload -U add-zsh-hook
+add-zsh-hook precmd theme_precmd
